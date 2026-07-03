@@ -1,0 +1,310 @@
+<div class="h-screen overflow-hidden flex bg-white font-sans text-slate-800">
+  <!-- ── Panel Izquierdo: Branding (oculto en móvil) ── -->
+  <div class="hidden lg:flex lg:w-1/2 relative bg-slate-900 overflow-hidden">
+    <!-- Imagen de fondo con overlay -->
+    <div class="absolute inset-0">
+      <img
+        src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&q=80&w=2070"
+        alt="Bodega de ropa mayorista"
+        class="w-full h-full object-cover opacity-30 mix-blend-overlay"
+      />
+      <div
+        class="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/80 to-transparent"
+      ></div>
+    </div>
+
+    <!-- Contenido del branding -->
+    <div class="relative z-10 flex flex-col justify-between p-16 w-full max-w-2xl mx-auto">
+      <div>
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2 mb-16 hover:opacity-80 transition-opacity">
+          <div
+            class="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl"
+          >
+            C
+          </div>
+          <span class="text-2xl font-bold tracking-tight text-white">
+            Chiconcuac<span class="text-sky-500">Market</span>
+            <span
+              class="ml-2 text-xs font-medium bg-white/20 text-white px-2 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm"
+              >Partners</span
+            >
+          </span>
+        </a>
+
+        <h1 class="text-4xl font-extrabold text-white mb-6 leading-tight">
+          Lleva tu negocio al <br />
+          <span class="text-sky-400">siguiente nivel</span> digital.
+        </h1>
+        <p class="text-slate-300 text-lg mb-12 max-w-md font-light leading-relaxed">
+          Únete a la red de fabricantes y mayoristas más grande de México. Vende 24/7 sin
+          preocuparte por la logística.
+        </p>
+
+        <!-- Beneficios -->
+        <div class="space-y-6">
+          @for (benefit of benefits; track benefit) {
+          <div class="flex items-start gap-3">
+            <!-- CheckCircle icon -->
+            <i class="pi pi-check-circle text-sky-500 text-lg shrink-0 mt-0.5"></i>
+            <span class="text-slate-200">{{ benefit }}</span>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Testimonial -->
+      <div class="pt-12">
+        <p class="text-slate-400 text-sm">
+          "Desde que nos unimos, nuestras ventas de mayoreo a otros estados crecieron un 300%."
+          <br />
+          <span class="text-white font-semibold mt-2 inline-block"
+            >— Textiles Familia Rodríguez</span
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Panel Derecho: Formulario ── -->
+  <div
+    class="w-full lg:w-1/2 h-full flex flex-col items-center p-6 sm:p-12 bg-slate-50 lg:bg-white relative overflow-y-auto"
+  >
+    <!-- Botón volver -->
+    <button
+      class="absolute top-6 left-6 lg:top-8 lg:right-8 lg:left-auto flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors z-20"
+      type="button"
+    >
+      <!-- ArrowLeft icon (mobile) -->
+      <i class="pi pi-arrow-left lg:hidden text-sm"></i>
+      <span class="hidden lg:inline">Volver al Marketplace</span>
+      <span class="lg:hidden">Volver</span>
+    </button>
+
+    <div class="w-full max-w-md my-auto py-12">
+      <!-- Cabecera -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-slate-900 mb-2">
+          {{ isLogin() ? 'Bienvenido de vuelta' : 'Crea tu tienda' }}
+        </h2>
+        <p class="text-slate-500 text-sm">
+          {{
+            isLogin()
+              ? 'Ingresa a tu panel de control de vendedor.'
+              : 'Registra tu negocio y empieza a vender al mayoreo hoy mismo.'
+          }}
+        </p>
+      </div>
+
+      <!-- Error banner -->
+      @if (authService.error()) {
+      <div
+        class="mb-6 bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100 flex items-start gap-2"
+      >
+        <i class="pi pi-exclamation-circle text-base shrink-0 mt-0.5"></i>
+        {{ authService.error() }}
+      </div>
+      }
+
+      <!-- Tabs: Login / Registro -->
+      <div class="flex bg-slate-100 p-1 rounded-xl mb-8">
+        <button
+          type="button"
+          (click)="setTab(true)"
+          [class]="
+            'flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ' +
+            (isLogin()
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-700')
+          "
+        >
+          Iniciar Sesión
+        </button>
+        <button
+          type="button"
+          (click)="setTab(false)"
+          [class]="
+            'flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ' +
+            (!isLogin()
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-500 hover:text-slate-700')
+          "
+        >
+          Registro Nuevo
+        </button>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="animate-fade-in">
+        <!-- Campos extra para registro -->
+        @if (!isLogin()) {
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="col-span-2 sm:col-span-1 space-y-1.5">
+            <label class="text-sm font-medium text-slate-700">Nombre</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="pi pi-user text-slate-400 text-sm"></i>
+              </div>
+              <input
+                formControlName="firstName"
+                type="text"
+                placeholder="Juan"
+                class="input-field pl-10"
+              />
+            </div>
+          </div>
+          <div class="col-span-2 sm:col-span-1 space-y-1.5">
+            <label class="text-sm font-medium text-slate-700">Apellidos</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="pi pi-user text-slate-400 text-sm"></i>
+              </div>
+              <input
+                formControlName="lastName"
+                type="text"
+                placeholder="Pérez"
+                class="input-field pl-10"
+              />
+            </div>
+          </div>
+          <div class="col-span-2 space-y-1.5">
+            <label class="text-sm font-medium text-slate-700">Teléfono</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="pi pi-phone text-slate-400 text-sm"></i>
+              </div>
+              <input
+                formControlName="phoneNumber"
+                type="tel"
+                placeholder="55 1234 5678"
+                class="input-field pl-10"
+              />
+            </div>
+          </div>
+        </div>
+        }
+
+        <div class="space-y-4">
+          <!-- Email -->
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-slate-700">Correo Electrónico</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="pi pi-envelope text-slate-400 text-sm"></i>
+              </div>
+              <input
+                formControlName="email"
+                type="email"
+                placeholder="correo@negocio.com"
+                class="input-field pl-10"
+              />
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-slate-700">Contraseña</label>
+              @if (isLogin()) {
+              <a href="#" class="text-xs font-semibold text-sky-600 hover:text-sky-700"
+                >¿Olvidaste tu contraseña?</a
+              >
+              }
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="pi pi-lock text-slate-400 text-sm"></i>
+              </div>
+              <input
+                formControlName="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="••••••••"
+                class="input-field pl-10 pr-10"
+              />
+              <button
+                type="button"
+                (click)="showPassword.update(v => !v)"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                @if (showPassword()) {
+                <i class="pi pi-eye-slash text-sm"></i>
+                } @else {
+                <i class="pi pi-eye text-sm"></i>
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- Términos (solo registro) -->
+          @if (!isLogin()) {
+          <div class="flex items-start gap-2 pt-2">
+            <input
+              type="checkbox"
+              id="terms"
+              formControlName="terms"
+              class="mt-1 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+            />
+            <label for="terms" class="text-xs text-slate-500 leading-tight">
+              Al registrarte, aceptas nuestros
+              <a href="#" class="text-sky-600 hover:underline">Términos de Servicio</a> y la
+              <a href="#" class="text-sky-600 hover:underline">Política de Privacidad</a> para
+              vendedores.
+            </label>
+          </div>
+          }
+
+          <!-- Submit button -->
+          <button
+            type="submit"
+            [disabled]="authService.loading()"
+            class="w-full bg-sky-600 hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all shadow-md shadow-sky-600/20 mt-6 flex items-center justify-center gap-2"
+          >
+            @if (authService.loading()) {
+            <i class="pi pi-spin pi-spinner text-sm"></i>
+            Cargando... } @else if (isLogin()) { Ingresar al Panel
+            <i class="pi pi-sign-in text-sm"></i>
+            } @else { Crear Cuenta de Vendedor
+            <i class="pi pi-user-plus text-sm"></i>
+            }
+          </button>
+        </div>
+      </form>
+
+      <!-- Divider -->
+      <div class="relative flex items-center py-6 mt-4">
+        <div class="grow border-t border-slate-200"></div>
+        <span class="shrink-0 mx-4 text-slate-400 text-xs uppercase tracking-wider font-medium"
+          >O continuar con</span
+        >
+        <div class="grow border-t border-slate-200"></div>
+      </div>
+
+      <!-- Google button -->
+      <button
+        type="button"
+        (click)="onGoogleSubmit()"
+        [disabled]="authService.loading()"
+        class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 disabled:opacity-60 text-slate-700 font-semibold py-3.5 rounded-xl transition-all border border-slate-200 shadow-sm"
+      >
+        @if (!authService.loading()) {
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          class="w-5 h-5"
+          alt="Google"
+        />
+        }
+        {{ authService.loading() ? 'Cargando...' : 'Google' }}
+      </button>
+
+      <!-- Ayuda -->
+      <div class="mt-10 text-center border-t border-slate-200 pt-6">
+        <p class="text-sm text-slate-500">
+          ¿Necesitas ayuda con tu registro?<br class="sm:hidden" />
+          <a href="#" class="text-sky-600 font-semibold hover:underline">
+            Contacta a soporte para locatarios</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

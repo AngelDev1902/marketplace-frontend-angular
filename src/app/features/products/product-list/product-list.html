@@ -1,0 +1,254 @@
+<div class="space-y-4 p-1 sm:p-2">
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4"
+  >
+    <div>
+      <h1 class="text-xl font-bold text-primary tracking-tight flex items-center gap-2">
+        <i class="pi pi-box text-blue-600 text-xl"></i>
+        Mis Productos
+      </h1>
+      <p class="text-secondary text-xs mt-0.5">
+        Administra los productos de tu catálogo, precios base y niveles de mayoreo.
+      </p>
+    </div>
+    <p-button
+      label="Nuevo Producto"
+      icon="pi pi-plus"
+      (onClick)="handleCreateClick()"
+      size="small"
+    ></p-button>
+  </div>
+
+  @if (!loading() && !error() && products().length > 0) {
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div
+      class="bg-card p-4 rounded-xl shadow-xs flex flex-row items-center gap-3 transition-colors duration-300"
+    >
+      <div class="p-2.5 bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 rounded-lg">
+        <i class="pi pi-shopping-bag text-lg"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-secondary uppercase tracking-wider">
+          Productos Registrados
+        </p>
+        <h3 class="text-lg font-extrabold text-primary mt-0.5">
+          {{ registeredCount() }}
+        </h3>
+      </div>
+    </div>
+
+    <div
+      class="bg-card p-4 rounded-xl shadow-xs flex flex-row items-center gap-3 transition-colors duration-300"
+    >
+      <div class="p-2.5 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 rounded-lg">
+        <i class="pi pi-check-circle text-lg"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-secondary uppercase tracking-wider">
+          Productos Activos
+        </p>
+        <h3 class="text-lg font-extrabold text-primary mt-0.5">
+          {{ activeCount() }}
+        </h3>
+      </div>
+    </div>
+
+    <div
+      class="bg-card p-4 rounded-xl shadow-xs flex flex-row items-center gap-3 transition-colors duration-300"
+    >
+      <div class="p-2.5 bg-purple-50/50 dark:bg-purple-950/20 text-purple-600 rounded-lg">
+        <i class="pi pi-objects-column text-lg"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-secondary uppercase tracking-wider">
+          Stock Físico Total
+        </p>
+        <h3 class="text-lg font-extrabold text-primary mt-0.5">{{ totalStock() }} piezas</h3>
+      </div>
+    </div>
+  </div>
+  } @if (loading() || deleting()) {
+  <div class="flex flex-col items-center justify-center py-16 bg-card rounded-xl shadow-xs">
+    <p-progressspinner styleClass="w-10 h-10" strokeWidth="4"></p-progressspinner>
+    <p class="text-secondary text-xs mt-3 font-medium animate-pulse">
+      {{ deleting() ? 'Eliminando producto...' : 'Cargando catálogo...' }}
+    </p>
+  </div>
+  } @else if (error()) {
+  <div
+    class="bg-red-50/40 border border-red-200 dark:bg-red-950/10 dark:border-red-900/50 rounded-xl p-6 flex flex-col items-center text-center max-w-md mx-auto shadow-xs"
+  >
+    <i class="pi pi-exclamation-circle text-red-500 text-3xl mb-2"></i>
+    <h3 class="text-sm font-bold text-primary">Error al procesar la solicitud</h3>
+    <p class="text-secondary text-xs mt-1">{{ error() }}</p>
+    <p-button
+      label="Reintentar"
+      icon="pi pi-refresh"
+      (onClick)="fetchProducts()"
+      [outlined]="true"
+      severity="secondary"
+      size="small"
+      styleClass="mt-4"
+    ></p-button>
+  </div>
+  } @else if (products().length === 0) {
+  <div
+    class="bg-card rounded-xl p-10 text-center shadow-xs flex flex-col items-center max-w-xl mx-auto transition-colors duration-300"
+  >
+    <div class="w-16 h-16 bg-app text-muted rounded-xl flex items-center justify-center mb-4">
+      <i class="pi pi-box text-3xl"></i>
+    </div>
+    <h2 class="text-base font-bold text-primary">Aún no tienes productos</h2>
+    <p class="text-secondary text-xs max-w-xs mx-auto mt-1 leading-relaxed">
+      Comienza a vender agregando tus primeros productos al catálogo. Podrás definir precios de
+      mayoreo.
+    </p>
+    <p-button
+      label="Crear Primer Producto"
+      icon="pi pi-plus"
+      (onClick)="handleCreateClick()"
+      size="small"
+      styleClass="mt-6"
+    ></p-button>
+  </div>
+  } @else {
+  <div class="bg-card rounded-xl overflow-hidden shadow-xs transition-colors duration-300">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr
+            class="bg-app border-b border-default text-secondary font-bold uppercase tracking-wider"
+          >
+            <th class="p-3">Producto</th>
+            <th class="p-3">Categoría</th>
+            <th class="p-3">Precio Base</th>
+            <th class="p-3">Variantes</th>
+            <th class="p-3">Stock Físico</th>
+            <th class="p-3">Estado</th>
+            <th class="p-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border-default">
+          @for (product of products(); track product.uuid) { @let isProductActive =
+          product.status.value === 'ACTIVO';
+          <tr class="hover:bg-app/50 transition-colors">
+            <td class="p-3">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-lg overflow-hidden bg-app border border-default shrink-0 flex items-center justify-center"
+                >
+                  @if (product.imagePrimary) {
+                  <img
+                    [src]="product.imagePrimary.imageUrl"
+                    [alt]="product.name"
+                    class="w-full h-full object-cover"
+                  />
+                  } @else {
+                  <i class="pi pi-box text-muted text-base"></i>
+                  }
+                </div>
+                <div>
+                  <div class="font-bold text-primary text-xs leading-tight">
+                    {{ product.name }}
+                  </div>
+                  <div class="text-[10px] text-muted mt-0.5 font-mono">
+                    {{ product.uuid.substring(0, 8) }}...
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <td class="p-3 text-secondary font-medium">
+              <span class="bg-app text-secondary text-[10px] px-2 py-0.5 rounded-full">
+                {{ product.categoryKey }}
+              </span>
+            </td>
+
+            <td class="p-3 font-bold text-primary">
+              ${{ Number(product.basePrice).toFixed(2) }} MXN
+            </td>
+
+            <td class="p-3 text-secondary font-semibold">
+              {{ product.quantityVariants || 0 }} uds
+            </td>
+
+            <td class="p-3 font-semibold text-primary">{{ product.totalStock || 0 }} uds</td>
+
+            <td class="p-3">
+              @if (isProductActive) {
+              <span
+                class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 text-[10px] px-2 py-0.5 rounded-full font-bold"
+              >
+                {{ product.status.label }}
+              </span>
+              } @else {
+              <span
+                class="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-[10px] px-2 py-0.5 rounded-full font-bold"
+              >
+                {{ product.status.label || 'Inactivo' }}
+              </span>
+              }
+            </td>
+
+            <td class="p-3">
+              <div class="flex gap-1.5 items-center justify-end">
+                <p-button
+                  label="Fotos"
+                  icon="pi pi-image"
+                  [outlined]="true"
+                  severity="secondary"
+                  size="small"
+                  styleClass="h-7 text-[10px]"
+                  (onClick)="handleOpenModal(product)"
+                ></p-button>
+
+                <p-button
+                  label="Variantes"
+                  icon="pi pi-clone"
+                  [outlined]="true"
+                  severity="info"
+                  size="small"
+                  styleClass="h-7 text-[10px]"
+                  (onClick)="handleOpenVariantModal(product)"
+                ></p-button>
+
+                <p-button
+                  icon="pi pi-pencil"
+                  [outlined]="true"
+                  severity="secondary"
+                  size="small"
+                  styleClass="h-7 w-7"
+                  [text]="true"
+                  (onClick)="handleOpenEditModal(product)"
+                  title="Editar producto"
+                ></p-button>
+
+                <p-button
+                  icon="pi pi-trash"
+                  [outlined]="true"
+                  severity="danger"
+                  size="small"
+                  styleClass="h-7 w-7"
+                  [text]="true"
+                  (onClick)="handleDeleteProductClick(product.uuid)"
+                  title="Eliminar producto"
+                ></p-button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+
+  <app-product-image-modal
+    [isOpen]="isModalOpen()"
+    [product]="selectedProduct()"
+    (onClose)="handleCloseModal()"
+    (onSaveSuccess)="fetchProducts()"
+  ></app-product-image-modal>
+
+  <p-confirmdialog></p-confirmdialog>
+</div>

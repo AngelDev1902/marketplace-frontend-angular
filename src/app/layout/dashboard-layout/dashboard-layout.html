@@ -1,0 +1,23 @@
+<div class="flex flex-col h-screen bg-app font-sans overflow-hidden">
+  <!-- Header: barra superior de ancho completo -->
+  <app-header
+    [isSidebarCollapsed]="isSidebarCollapsed()"
+    [onToggleSidebar]="toggleSidebar.bind(this)"
+  />
+
+  <div class="flex flex-1 min-h-0 overflow-hidden">
+    <!-- Sidebar: barra lateral colapsable -->
+    <app-sidebar
+      #sidebar
+      [isCollapsed]="isSidebarCollapsed()"
+      [closeCallback]="collapseSidebar.bind(this)"
+    />
+
+    <!-- Workspace principal -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-4 bg-app">
+      <div class="max-w-7xl mx-auto animate-fade-in">
+        <router-outlet />
+      </div>
+    </main>
+  </div>
+</div>

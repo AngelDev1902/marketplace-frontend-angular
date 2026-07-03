@@ -1,0 +1,65 @@
+<!-- Mobile Overlay -->
+@if (!isCollapsed()) {
+<div
+  class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+  (click)="closeCallback()()"
+></div>
+}
+
+<!-- Sidebar -->
+<aside [class]="sidebarClass()">
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto py-3 px-1.5 flex flex-col gap-1.5">
+    @for (item of navItems; track item.path) {
+    <a
+      [routerLink]="item.path"
+      routerLinkActive="bg-sky-600/10 text-sky-500 border-l-2 border-sky-500 font-semibold"
+      [routerLinkActiveOptions]="{ exact: item.exact }"
+      [class]="linkClass()"
+      [title]="isCollapsed() ? item.name : ''"
+      (click)="onMobileClose()"
+    >
+      <i [class]="'pi ' + item.icon + ' text-base shrink-0'"></i>
+      @if (!isCollapsed()) {
+      <span class="text-[12px]">{{ item.name }}</span>
+      }
+    </a>
+    }
+  </nav>
+
+  <!-- Theme Toggle -->
+  <div class="p-2 border-t border-slate-800">
+    <button
+      (click)="themeService.toggle()"
+      [class]="themeToggleClass()"
+      [title]="isCollapsed() ? 'Cambiar Tema' : ''"
+      type="button"
+    >
+      <i
+        [class]="
+          themeService.isDark()
+            ? 'pi pi-sun text-amber-500 text-sm shrink-0'
+            : 'pi pi-moon text-slate-400 text-sm shrink-0'
+        "
+      ></i>
+      @if (!isCollapsed()) {
+      <span class="text-[12px]">{{ themeService.isDark() ? 'Modo Claro' : 'Modo Oscuro' }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- Logout -->
+  <div class="p-2 border-t border-slate-800">
+    <button
+      (click)="logout()"
+      [class]="logoutClass()"
+      [title]="isCollapsed() ? 'Cerrar Sesión' : ''"
+      type="button"
+    >
+      <i class="pi pi-sign-out text-sm shrink-0"></i>
+      @if (!isCollapsed()) {
+      <span class="text-[12px]">Cerrar Sesión</span>
+      }
+    </button>
+  </div>
+</aside>

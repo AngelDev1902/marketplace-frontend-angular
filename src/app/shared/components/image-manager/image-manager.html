@@ -1,0 +1,230 @@
+<div class="space-y-5">
+  @if (error) {
+  <div
+    class="bg-red-50 dark:bg-red-950/15 border border-red-200 dark:border-red-900/50 rounded-xl p-3 text-red-600 dark:text-red-400 text-xs flex items-center gap-2"
+  >
+    <i class="pi pi-exclamation-circle text-xs"></i>
+    <span>{{ error }}</span>
+  </div>
+  }
+
+  <div class="space-y-2.5">
+    <div class="flex justify-between items-center">
+      <span
+        class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+      >
+        Galería de Fotos ({{ existingImages.length }})
+      </span>
+
+      @if (existingImages.length > 1) {
+      <p-button
+        size="small"
+        [disabled]="saving() || actionLoading"
+        (onClick)="handleSaveOrder()"
+        styleClass="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3.5 h-7 rounded-lg flex items-center gap-1 shadow-xs border-none"
+      >
+        @if (saving() || actionLoading) {
+        <i class="pi pi-spin pi-spinner text-xs"></i>
+        } @else {
+        <i class="pi pi-save text-xs"></i>
+        <span>Guardar Cambios de Orden</span>
+        }
+      </p-button>
+      }
+    </div>
+
+    @if (existingImages.length === 0) {
+    <div
+      class="text-center py-8 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-800/10"
+    >
+      <p class="text-xs text-slate-400">Arrastra archivos abajo para cargar tu primera foto.</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-3">
+      @for (img of existingImages; track img.id; let idx = $index) {
+      <div
+        [attr.draggable]="!saving() && !actionLoading"
+        (dragstart)="handleDragStart(idx)"
+        (dragover)="handleDragOver($event)"
+        (drop)="handleDrop(idx)"
+        class="relative aspect-square rounded-xl overflow-hidden border group shadow-2xs bg-slate-100 dark:bg-slate-800 transition-all duration-200 cursor-grab active:cursor-grabbing"
+        [ngClass]="{
+          'border-amber-400 ring-2 ring-amber-400/20 scale-[1.02]': img.isPrimary,
+          'border-slate-200 dark:border-slate-700': !img.isPrimary,
+          'opacity-40 scale-95': draggedIdx === idx
+        }"
+      >
+        <img
+          [src]="img.imageUrl"
+          alt="existente"
+          class="w-full h-full object-cover select-none pointer-events-none"
+        />
+
+        @if (img.isPrimary) {
+        <div
+          class="absolute top-1.5 left-1.5 bg-amber-400 text-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs select-none"
+        >
+          <i class="pi pi-star-fill text-[8px]"></i>
+          <span>Portada</span>
+        </div>
+        }
+
+        <div
+          class="absolute bottom-1.5 right-1.5 bg-slate-950/60 text-white font-bold text-[9px] w-5 h-5 rounded-full flex items-center justify-center backdrop-blur-xs select-none"
+        >
+          {{ img.displayOrder }}
+        </div>
+
+        <div
+          class="absolute top-1.5 right-1.5 bg-slate-950/40 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        >
+          <i class="pi pi-bars text-[10px]"></i>
+        </div>
+
+        <div
+          class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2"
+        >
+          <div class="flex justify-between items-center w-full">
+            <button
+              type="button"
+              (click)="handleSetPrimary(img.id)"
+              [disabled]="img.isPrimary || saving() || actionLoading"
+              class="p-1 rounded-lg transition-colors"
+              [ngClass]="
+                img.isPrimary
+                  ? 'text-amber-400'
+                  : 'text-white/60 hover:text-amber-400 hover:bg-white/10'
+              "
+              title="Hacer Portada"
+            >
+              <i class="pi text-sm" [ngClass]="img.isPrimary ? 'pi-star-fill' : 'pi-star'"></i>
+            </button>
+
+            <button
+              type="button"
+              (click)="handleDeleteClick(img.id)"
+              [disabled]="saving() || actionLoading"
+              class="p-1 text-white/60 hover:text-red-400 hover:bg-white/10 rounded-lg transition-colors"
+              title="Eliminar imagen"
+            >
+              <i class="pi pi-trash text-sm"></i>
+            </button>
+          </div>
+          <div class="text-[7px] font-mono text-white/50 truncate w-full text-center">
+            Arrastrar para reordenar
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <div class="border-t border-slate-200 dark:border-slate-800 my-3"></div>
+
+  <div class="space-y-3">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+      <span
+        class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+      >
+        Cargar Nuevas Imágenes
+      </span>
+
+      <div class="flex gap-2 items-center">
+        <p-button
+          size="small"
+          styleClass="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[10px] px-3.5 h-7 rounded-lg relative border-none"
+        >
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            (change)="handleFileChange($event)"
+            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          />
+          <i class="pi pi-upload text-xs mr-1"></i>
+          <span>Seleccionar Fotos Locales</span>
+        </p-button>
+
+        @if (newImages.length > 0) {
+        <p-button
+          size="small"
+          [disabled]="saving() || actionLoading"
+          (onClick)="handleUploadClick()"
+          styleClass="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3.5 h-7 rounded-lg shadow-xs border-none"
+        >
+          @if (saving() || actionLoading) {
+          <i class="pi pi-spin pi-spinner text-xs"></i>
+          } @else {
+          <span>Subir Nuevas ({{ newImages.length }})</span>
+          }
+        </p-button>
+        }
+      </div>
+    </div>
+
+    @if (newImages.length > 0) {
+    <div
+      class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-3 p-3 bg-slate-50 dark:bg-slate-800/10 border border-slate-200 dark:border-slate-800 rounded-xl"
+    >
+      @for (img of newImages; track img.id) {
+      <div
+        class="relative aspect-square rounded-xl overflow-hidden border group shadow-2xs bg-white dark:bg-slate-900 transition-all duration-200"
+        [ngClass]="
+          img.isPrimary
+            ? 'border-amber-400 ring-2 ring-amber-400/20'
+            : 'border-slate-200 dark:border-slate-700'
+        "
+      >
+        <img [src]="img.previewUrl" [alt]="img.file.name" class="w-full h-full object-cover" />
+
+        @if (img.isPrimary) {
+        <div
+          class="absolute top-1.5 left-1.5 bg-amber-400 text-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs"
+        >
+          <i class="pi pi-star-fill text-[8px]"></i>
+          <span>Portada</span>
+        </div>
+        }
+
+        <div
+          class="absolute bottom-1.5 right-1.5 bg-slate-950/60 text-white font-bold text-[9px] w-5 h-5 rounded-full flex items-center justify-center backdrop-blur-xs"
+        >
+          {{ img.order }}
+        </div>
+
+        <div
+          class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2 text-white"
+        >
+          <div class="flex justify-between items-center w-full">
+            <button
+              type="button"
+              (click)="handleSetPrimaryNewImage(img.id)"
+              class="p-1 rounded-lg transition-colors"
+              [ngClass]="
+                img.isPrimary
+                  ? 'text-amber-400'
+                  : 'text-white/60 hover:text-amber-400 hover:bg-white/10'
+              "
+              title="Hacer Portada"
+            >
+              <i class="pi text-sm" [ngClass]="img.isPrimary ? 'pi-star-fill' : 'pi-star'"></i>
+            </button>
+            <button
+              type="button"
+              (click)="handleRemoveNewImage(img.id)"
+              class="p-1 text-white/60 hover:text-red-400 hover:bg-white/10 rounded-lg transition-colors"
+              title="Eliminar de cola"
+            >
+              <i class="pi pi-trash text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <p-confirmdialog></p-confirmdialog>
+</div>
