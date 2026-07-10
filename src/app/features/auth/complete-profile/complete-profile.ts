@@ -1,43 +1,51 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { FirebaseAuthService } from '../../../core/services/firebase-auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { VendorRegistrationDto } from '../../../shared/models/requests/auth.request.model';
+import { finalize } from 'rxjs';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './complete-profile.html',
-  styles: [
-    `
-      .input-field {
-        width: 100%;
-        padding: 0.625rem 0.875rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.75rem;
-        font-size: 0.875rem;
-        color: #0f172a;
-        background: #fff;
-        transition: border-color 0.15s, box-shadow 0.15s;
-        outline: none;
-      }
-      .input-field:focus {
-        border-color: #0ea5e9;
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-      }
-      .input-field::placeholder {
-        color: #94a3b8;
-      }
-      .input-field[readonly] {
-        cursor: not-allowed;
-      }
-    `,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    InputTextModule,
+    ButtonModule,
+    IconFieldModule,
+    InputIconModule,
+    ToggleSwitchModule,
   ],
+  templateUrl: './complete-profile.html',
 })
-export class CompleteProfileComponent {
+export class CompleteProfileComponent implements OnInit, OnDestroy {
   readonly authService = inject(AuthService);
+  private readonly firebaseAuthService = inject(FirebaseAuthService);
+  private readonly themeService = inject(ThemeService);
   private readonly fb = inject(FormBuilder);
+
+  ngOnInit(): void {
+    const root = document.documentElement;
+    root.classList.remove('dark');
+    root.setAttribute('data-theme', 'light');
+  }
+
+  ngOnDestroy(): void {
+    const root = document.documentElement;
+    if (this.themeService.isDark()) {
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+    }
+  }
 
   // Signals de estado
   readonly sellOnline = signal(false);
@@ -57,7 +65,7 @@ export class CompleteProfileComponent {
 
   /**
    * Toggle del switch "Vendo online"
-   * Cuando se activa, limpia los campos de dirección (igual que en React)
+   * Cuando se activa, limpia los campos de dirección
    */
   toggleSellOnline(): void {
     const next = !this.sellOnline();
@@ -76,14 +84,16 @@ export class CompleteProfileComponent {
   }
 
   /**
-   * Geolocalización del navegador — lógica idéntica al original
+   * Geolocalización del navegador
    */
   getLocation(): void {
     if (!navigator.geolocation) {
       alert('La geolocalización no es soportada por tu navegador.');
       return;
     }
+
     this.geoLoading.set(true);
+    
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.form.patchValue({
@@ -100,8 +110,10 @@ export class CompleteProfileComponent {
     );
   }
 
-  async onSubmit(): Promise<void> {
+  onSubmit(): void {
     if (!this.form.get('storeName')?.value) return;
+    this.authService.setLoading(true);
+    this.authService.clearError();
     const v = this.form.value;
 
     const payload: VendorRegistrationDto = {
@@ -116,6 +128,16 @@ export class CompleteProfileComponent {
       longitude: v.longitude ? parseFloat(v.longitude) : undefined,
     };
 
-    await this.authService.completeVendorProfile(payload);
+    this.firebaseAuthService
+      .completeProfile(payload)
+      .pipe(finalize(() => this.authService.setLoading(false)))
+      .subscribe({
+        next: (response) => {
+          this.authService.setSession(response);
+        },
+        error: (err) => {
+          this.authService.setError(err.message || 'Error al completar el perfil del negocio');
+        },
+      });
   }
 }

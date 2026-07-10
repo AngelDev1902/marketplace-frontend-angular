@@ -95,7 +95,7 @@ export class SidebarComponent {
     }
   }
 
-  async logout(): Promise<void> {
-    await this.authService.logout();
+  logout(): void {
+    this.authService.logout();
   }
 }

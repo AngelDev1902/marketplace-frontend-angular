@@ -13,8 +13,7 @@ export const routes: Routes = [
   {
     path: 'auth/login',
     canActivate: [publicGuard],
-    loadComponent: () =>
-      import('./features/auth/login/login').then((m) => m.LoginComponent),
+    loadComponent: () => import('./features/auth/login/login').then((m) => m.LoginComponent),
   },
   {
     path: 'auth/complete-profile',
@@ -30,9 +29,7 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./layout/dashboard-layout/dashboard-layout').then(
-        (m) => m.DashboardLayoutComponent
-      ),
+      import('./layout/dashboard-layout/dashboard-layout').then((m) => m.DashboardLayoutComponent),
     children: [
       {
         path: '',

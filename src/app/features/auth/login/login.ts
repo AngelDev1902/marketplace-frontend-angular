@@ -1,45 +1,68 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
+import { FirebaseAuthService } from '../../../core/services/firebase-auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
+import { LogoPrimary } from '../../../shared/components/logo-primary/logo-primary';
+import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
+import { PasswordModule } from 'primeng/password';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 /**
- * Contiene login Y registro en un mismo componente con tab switcher,
- * replicando exactamente el diseño de dos paneles del original:
  *   - Panel izquierdo: Branding / beneficios (oculto en móvil)
  *   - Panel derecho: Formulario con tabs Login / Registro
  */
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.html',
-  styles: [
-    `
-      .input-field {
-        width: 100%;
-        padding: 0.625rem 0.875rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.75rem;
-        font-size: 0.875rem;
-        color: #0f172a;
-        background: #fff;
-        transition: border-color 0.15s, box-shadow 0.15s;
-        outline: none;
-      }
-      .input-field:focus {
-        border-color: #0ea5e9;
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-      }
-      .input-field::placeholder {
-        color: #94a3b8;
-      }
-    `,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    LogoPrimary,
+    InputTextModule,
+    InputNumberModule,
+    CheckboxModule,
+    ButtonModule,
+    PasswordModule,
+    IconFieldModule,
+    InputIconModule,
+    SelectButtonModule,
   ],
+  templateUrl: './login.html',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   readonly authService = inject(AuthService);
+  private readonly firebaseAuthService = inject(FirebaseAuthService);
   private readonly fb = inject(FormBuilder);
+  private readonly themeService = inject(ThemeService);
+
+  // Al iniciar el componente, se fuerza el tema claro. Al destruirse, se restaura el tema anterior.
+  ngOnInit(): void {
+    const root = document.documentElement;
+    root.classList.remove('dark');
+    root.setAttribute('data-theme', 'light');
+  }
+
+  ngOnDestroy(): void {
+    const root = document.documentElement;
+    if (this.themeService.isDark()) {
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+    }
+  }
+
+  readonly stateOptions = [
+    { label: 'Iniciar Sesión', value: true },
+    { label: 'Registro Nuevo', value: false },
+  ];
 
   // Estado reactivo con signals
   readonly isLogin = signal(true);
@@ -70,25 +93,44 @@ export class LoginComponent {
     this.showPassword.set(false);
   }
 
-  async onSubmit(): Promise<void> {
+  onSubmit(): void {
     if (this.form.invalid) return;
+    this.authService.setLoading(true);
+    this.authService.clearError();
     const { email, password, firstName, lastName, phoneNumber } = this.form.value;
 
-    if (this.isLogin()) {
-      await this.authService.loginWithEmail(email!, password!);
-    } else {
-      await this.authService.registerWithEmail(
-        { firstName: firstName!, lastName: lastName!, phoneNumber: phoneNumber!, email: email! },
-        password!
-      );
-    }
+    const request$ = this.isLogin()
+      ? this.firebaseAuthService.loginWithEmail(email!, password!)
+      : this.firebaseAuthService.registerWithEmail(
+          { firstName: firstName!, lastName: lastName!, phoneNumber: phoneNumber!, email: email! },
+          password!
+        );
+
+    request$.pipe(finalize(() => this.authService.setLoading(false))).subscribe({
+      next: (response) => {
+        this.authService.setSession(response);
+      },
+      error: (err) => {
+        this.authService.setError(err.message || 'Credenciales inválidas o error en el servidor');
+      },
+    });
   }
 
-  async onGoogleSubmit(): Promise<void> {
-    if (this.isLogin()) {
-      await this.authService.loginWithGoogle();
-    } else {
-      await this.authService.registerWithGoogle();
-    }
+  onGoogleSubmit(): void {
+    this.authService.setLoading(true);
+    this.authService.clearError();
+
+    const request$ = this.isLogin()
+      ? this.firebaseAuthService.loginWithGoogle()
+      : this.firebaseAuthService.registerWithGoogle();
+
+    request$.pipe(finalize(() => this.authService.setLoading(false))).subscribe({
+      next: (response) => {
+        this.authService.setSession(response);
+      },
+      error: (err) => {
+        this.authService.setError(err.message || 'Error al iniciar sesión con Google');
+      },
+    });
   }
 }
