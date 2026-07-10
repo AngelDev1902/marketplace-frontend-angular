@@ -1,7 +1,5 @@
 <div class="space-y-4 p-1 sm:p-2">
-  <div
-    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4"
-  >
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4">
     <div>
       <h1 class="text-xl font-bold text-primary tracking-tight flex items-center gap-2">
         <i class="pi pi-box text-blue-600 text-xl"></i>
@@ -19,6 +17,7 @@
     ></p-button>
   </div>
 
+  <!-- Mostrar estadísticas de productos solo si hay productos registrados -->
   @if (!loading() && !error() && products().length > 0) {
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div
@@ -67,14 +66,20 @@
       </div>
     </div>
   </div>
-  } @if (loading() || deleting()) {
+  }
+
+  <!-- Si se esta cargando el catálogo o eliminando un producto, mostrar spinner de carga -->
+  @if (loading() || deleting()) {
   <div class="flex flex-col items-center justify-center py-16 bg-card rounded-xl shadow-xs">
-    <p-progressspinner styleClass="w-10 h-10" strokeWidth="4"></p-progressspinner>
+    <p-progressspinner class="w-10 h-10" strokeWidth="4"></p-progressspinner>
     <p class="text-secondary text-xs mt-3 font-medium animate-pulse">
       {{ deleting() ? 'Eliminando producto...' : 'Cargando catálogo...' }}
     </p>
   </div>
-  } @else if (error()) {
+  } 
+  
+  <!-- Si ocurre un error al cargar el catálogo, mostrar mensaje de error y botón para reintentar -->
+  @else if (error()) {
   <div
     class="bg-red-50/40 border border-red-200 dark:bg-red-950/10 dark:border-red-900/50 rounded-xl p-6 flex flex-col items-center text-center max-w-md mx-auto shadow-xs"
   >
@@ -91,7 +96,10 @@
       styleClass="mt-4"
     ></p-button>
   </div>
-  } @else if (products().length === 0) {
+  } 
+  
+  <!-- Si no hay productos registrados, mostrar mensaje de que no hay productos y botón para crear el primero -->
+  @else if (products().length === 0) {
   <div
     class="bg-card rounded-xl p-10 text-center shadow-xs flex flex-col items-center max-w-xl mx-auto transition-colors duration-300"
   >
@@ -111,7 +119,10 @@
       styleClass="mt-6"
     ></p-button>
   </div>
-  } @else {
+  } 
+  
+  <!-- Si hay productos registrados, mostrar tabla con los productos y sus detalles -->
+  @else {
   <div class="bg-card rounded-xl overflow-hidden shadow-xs transition-colors duration-300">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse text-xs">
@@ -130,7 +141,7 @@
         </thead>
         <tbody class="divide-y divide-border-default">
           @for (product of products(); track product.uuid) { @let isProductActive =
-          product.status.value === 'ACTIVO';
+          product.status.value === 'ACTIVE';
           <tr class="hover:bg-app/50 transition-colors">
             <td class="p-3">
               <div class="flex items-center gap-3">
@@ -152,14 +163,14 @@
                     {{ product.name }}
                   </div>
                   <div class="text-[10px] text-muted mt-0.5 font-mono">
-                    {{ product.uuid.substring(0, 8) }}...
+                    {{ product.description.substring(0, 40) }}...
                   </div>
                 </div>
               </div>
             </td>
 
-            <td class="p-3 text-secondary font-medium">
-              <span class="bg-app text-secondary text-[10px] px-2 py-0.5 rounded-full">
+            <td class="p-3 text-primary font-medium">
+              <span class="tag-glass-indigo text-[10px] px-2 py-0.5 rounded-full">
                 {{ product.categoryKey }}
               </span>
             </td>
@@ -177,13 +188,13 @@
             <td class="p-3">
               @if (isProductActive) {
               <span
-                class="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 text-[10px] px-2 py-0.5 rounded-full font-bold"
+                class="tag-glass-emerald px-2 py-0.5 rounded-full font-bold"
               >
                 {{ product.status.label }}
               </span>
               } @else {
               <span
-                class="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-[10px] px-2 py-0.5 rounded-full font-bold"
+                class="tag-glass-red px-2 py-0.5 rounded-full font-bold"
               >
                 {{ product.status.label || 'Inactivo' }}
               </span>
@@ -243,6 +254,7 @@
   </div>
   }
 
+  <!-- Modal para crear o editar un producto -->
   <app-product-image-modal
     [isOpen]="isModalOpen()"
     [product]="selectedProduct()"

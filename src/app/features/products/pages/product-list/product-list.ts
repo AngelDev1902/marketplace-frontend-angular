@@ -6,9 +6,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmationService } from 'primeng/api';
-import { ProductResponse } from '../../../shared/models/responses/product.response.model';
-import { ProductService } from '../../../core/services/product.service';
-import { ProductImageModalComponent } from '../product-image-modal/product-image-modal';
+import { ProductResponse } from '../../../../shared/models/responses/product.response.model';
+import { ProductService } from '../../../../core/services/product.service';
+import { ProductImageModalComponent } from '../../product-image-modal/product-image-modal';
 
 @Component({
   selector: 'app-product-list',
@@ -29,7 +29,6 @@ export class ProductListComponent implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly productService = inject(ProductService);
 
-  // Hacer el constructor Number disponible en la plantilla HTML
   readonly Number = Number;
 
   // Estado del componente usando Signals para optimizar la detección de cambios

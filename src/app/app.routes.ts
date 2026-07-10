@@ -41,14 +41,14 @@ export const routes: Routes = [
       {
         path: 'products',
         loadComponent: () =>
-          import('./features/products/product-list/product-list').then(
+          import('./features/products/pages/product-list/product-list').then(
             (m) => m.ProductListComponent
           ),
       },
       {
         path: 'products/new',
         loadComponent: () =>
-          import('./features/products/product-create/product-create.component').then(
+          import('./features/products/pages/product-create/product-create').then(
             (m) => m.ProductCreateComponent
           ),
       },

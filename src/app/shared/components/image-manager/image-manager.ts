@@ -40,11 +40,15 @@ export class ImageManagerComponent {
   /** Estado de guardado global en progreso */
   readonly saving = input(false);
 
+  /** Modo creación: si es verdadero, oculta botones de guardado individual y emite cambios reactivos */
+  readonly creationMode = input(false);
+
   /** Emisiones de acciones */
   readonly uploadNewImages = output<NewImageUpload[]>();
   readonly saveReorderedImages =
     output<{ id: string; isPrimary: boolean; displayOrder: number }[]>();
   readonly deleteImage = output<string>();
+  readonly imagesChange = output<NewImageUpload[]>();
 
   existingImages: LoadedImage[] = [];
   newImages: LocalNewImage[] = [];
@@ -155,6 +159,7 @@ export class ImageManagerComponent {
 
     const filesArray = Array.from(files);
     let currentNewImagesCount = this.newImages.length;
+    let loadedCount = 0;
 
     filesArray.forEach((file) => {
       const reader = new FileReader();
@@ -172,6 +177,10 @@ export class ImageManagerComponent {
         };
 
         this.newImages = [...this.newImages, newImgEntry];
+        loadedCount++;
+        if (loadedCount === filesArray.length && this.creationMode()) {
+          this._emitImagesChange();
+        }
       };
       reader.readAsDataURL(file);
     });
@@ -192,6 +201,10 @@ export class ImageManagerComponent {
       ...img,
       order: this.existingImages.length + idx + 1,
     }));
+
+    if (this.creationMode()) {
+      this._emitImagesChange();
+    }
   }
 
   handleSetPrimaryNewImage(id: string): void {
@@ -200,6 +213,10 @@ export class ImageManagerComponent {
       ...img,
       isPrimary: img.id === id,
     }));
+
+    if (this.creationMode()) {
+      this._emitImagesChange();
+    }
   }
 
   async handleUploadClick(): Promise<void> {
@@ -223,5 +240,18 @@ export class ImageManagerComponent {
     } finally {
       this.actionLoading = false;
     }
+  }
+
+  private _emitImagesChange(): void {
+    const payload: NewImageUpload[] = this.newImages.map((img) => {
+      const base64Data = img.previewUrl.split(',')[1] || '';
+      return {
+        file: img.file,
+        base64: base64Data,
+        order: img.order,
+        isPrimary: img.isPrimary,
+      };
+    });
+    this.imagesChange.emit(payload);
   }
 }

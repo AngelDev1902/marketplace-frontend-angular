@@ -3,8 +3,14 @@ import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProductService } from '../../../core/services/product.service';
-import { ProductResponse, ProductImageResponse } from '../../../shared/models/responses/product.response.model';
-import { ImageManagerComponent, NewImageUpload } from '../../../shared/components/image-manager/image-manager';
+import {
+  ProductResponse,
+  ProductImageResponse,
+} from '../../../shared/models/responses/product.response.model';
+import {
+  ImageManagerComponent,
+  NewImageUpload,
+} from '../../../shared/components/image-manager/image-manager';
 
 @Component({
   selector: 'app-product-image-modal',
@@ -73,7 +79,7 @@ export class ProductImageModalComponent {
         console.error(err);
         this.modalError.set('No se pudieron cargar las imágenes de este producto.');
         this.loadingImages.set(false);
-      }
+      },
     });
   }
 
@@ -103,7 +109,7 @@ export class ProductImageModalComponent {
           err.response?.data?.message || 'Error al subir las imágenes al servidor.'
         );
         this.saving.set(false);
-      }
+      },
     });
   }
 
@@ -128,7 +134,7 @@ export class ProductImageModalComponent {
           err.response?.data?.message || 'Error al guardar el orden de las imágenes.'
         );
         this.saving.set(false);
-      }
+      },
     });
   }
 
@@ -148,7 +154,7 @@ export class ProductImageModalComponent {
           err.response?.data?.message || 'Error al eliminar la imagen del servidor.'
         );
         this.saving.set(false);
-      }
+      },
     });
   }
 }

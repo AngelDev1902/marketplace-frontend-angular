@@ -5,28 +5,11 @@
   [draggable]="false"
   [resizable]="false"
   [closable]="true"
-  [showHeader]="false"
-  styleClass="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 max-w-2xl w-full p-0 relative"
+  [dismissableMask]="true"
+  [styleClass]="'w-full sm:w-[900px] max-w-[95vw]'"
+  header="Configurar imágenes del producto"
 >
-  <!-- Discret close button -->
-  <button
-    (click)="handleClose()"
-    class="absolute top-4 right-4 z-50 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer"
-    type="button"
-  >
-    <i class="pi pi-times text-sm"></i>
-  </button>
-
   <div class="p-6 overflow-y-auto max-h-[85vh] space-y-4">
-    <div>
-      <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-        Fotos de Producto
-      </h2>
-      <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">
-        Arrastra las fotos para cambiar su orden de visualización. La primera será la portada.
-      </p>
-    </div>
-
     @if (modalError()) {
     <div
       class="bg-red-50 dark:bg-red-950/15 border border-red-200 dark:border-red-900/50 rounded-xl p-3 text-red-650 dark:text-red-400 text-xs flex items-center gap-2"

@@ -1,0 +1,135 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h3 class="text-sm font-semibold text-primary">Variantes del Producto (Opcional)</h3>
+      <p class="text-xs text-muted">Configura las combinaciones de tallas y colores disponibles.</p>
+    </div>
+    <p-button
+      type="button"
+      icon="pi pi-plus"
+      label="Agregar Variante"
+      [outlined]="true"
+      size="small"
+      (onClick)="addVariant()"
+    />
+  </div>
+
+  @if (variants.length === 0) {
+  <div
+    class="text-center py-6 border border-dashed border-default rounded-xl bg-app text-muted text-xs"
+  >
+    No has agregado variantes para este producto.
+  </div>
+  } @else {
+  <div class="space-y-4">
+    @for (variant of variants; track $index; let i = $index) {
+    <div
+      [formGroup]="variant"
+      class="p-4 bg-app border border-default rounded-xl space-y-3 relative"
+    >
+      <!-- Encabezado de la Variante -->
+      <div class="flex items-center justify-between pb-2 border-b border-soft">
+        <span class="text-xs font-bold text-sky-600">Variante #{{ i + 1 }}</span>
+        <button
+          type="button"
+          (click)="removeVariant(i)"
+          class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 p-1 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+          title="Eliminar variante"
+        >
+          <i class="pi pi-trash text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Campos de la variante -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        <!-- Talla -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+            >Talla *</label
+          >
+          <p-select
+            formControlName="sizeKey"
+            [options]="sizes()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Talla"
+            class="w-full"
+            size="small"
+          />
+        </div>
+
+        <!-- Color -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+            >Color *</label
+          >
+          <p-select
+            formControlName="colorKey"
+            [options]="colors()"
+            optionLabel="name"
+            optionValue="key"
+            placeholder="Color"
+            class="w-full"
+            size="small"
+          />
+        </div>
+
+        <!-- SKU -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+            >SKU *</label
+          >
+          <input pInputText formControlName="sku" placeholder="Ej. VAR-001" class="w-full" pSize="small" />
+        </div>
+
+        <!-- Stock Inicial -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+            >Stock *</label
+          >
+          <p-inputnumber
+            formControlName="stockQuantity"
+            [min]="0"
+            placeholder="Ej. 10"
+            class="w-full"
+            inputStyleClass="w-full"
+            size="small"
+          />
+        </div>
+
+        <!-- Ajuste de Precio -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+            >Ajuste Precio *</label
+          >
+          <p-inputnumber
+            formControlName="priceAdjustment"
+            mode="currency"
+            currency="MXN"
+            locale="es-MX"
+            placeholder="Ej. 0, +15, -10"
+            class="w-full"
+            size="small"
+            inputStyleClass="w-full"
+          />
+        </div>
+      </div>
+
+      <!-- Descripción de variante -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+          >Descripción corta (Opcional)</label
+        >
+        <input
+          pInputText
+          formControlName="description"
+          placeholder="Ej. Variante de color especial o de temporada"
+          class="w-full"
+          pSize="small"
+        />
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>

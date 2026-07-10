@@ -10,7 +10,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
   private readonly http = inject(HttpClient);
-  private readonly BASE = `${environment.apiUrl}/public/catalog`;
+  private readonly BASE = `${environment.apiUrl}/public/catalogs`;
 
   getCategories(): Observable<CatalogOptionDto[]> {
     return this.http.get<CatalogOptionDto[]>(`${this.BASE}/categories`);

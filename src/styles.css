@@ -193,3 +193,15 @@ body {
 .animate-slide-in-left {
   animation: slideInLeft 0.2s ease-out;
 }
+
+/* ONFIGURACIONES DE COMPONENTES DE PRIMENG */
+.p-dialog .p-dialog-header {
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-default);
+  padding: 0.3rem 1rem;
+}
+
+.p-dialog .p-dialog-title {
+  font-size: 1rem;
+  font-weight: 600;
+}

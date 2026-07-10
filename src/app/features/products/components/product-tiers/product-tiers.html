@@ -1,0 +1,93 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h3 class="text-sm font-semibold text-primary">Precios de Mayoreo (Opcional)</h3>
+      <p class="text-xs text-muted">Configura descuentos por volumen de compra.</p>
+    </div>
+    <p-button
+      type="button"
+      icon="pi pi-plus"
+      label="Agregar Escala"
+      [outlined]="true"
+      size="small"
+      (onClick)="addTier()"
+    />
+  </div>
+
+  @if (tiers.length === 0) {
+  <div
+    class="text-center py-6 border border-dashed border-default rounded-xl bg-app text-muted text-xs"
+  >
+    No has agregado escalas de mayoreo para este producto.
+  </div>
+  } @else {
+  <div class="space-y-3">
+    @for (tier of tiers; track $index; let i = $index) {
+    <div
+      [formGroup]="tier"
+      class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center p-3 bg-app border border-default rounded-xl relative"
+    >
+      <div class="space-y-1">
+        <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+          >Cant. Mínima</label
+        >
+        <p-inputnumber
+          formControlName="minQuantity"
+          [min]="1"
+          placeholder="Min"
+          class="w-full"
+          size="small"
+          inputStyleClass="w-full"
+        />
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+          >Cant. Máxima</label
+        >
+        <p-inputnumber
+          formControlName="maxQuantity"
+          [min]="1"
+          placeholder="Max (Opcional)"
+          class="w-full"
+          size="small"
+          inputStyleClass="w-full"
+        />
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-semibold text-secondary uppercase tracking-wider"
+          >Precio Unitario</label
+        >
+        <p-inputnumber
+          formControlName="price"
+          mode="currency"
+          currency="MXN"
+          locale="es-MX"
+          placeholder="Precio"
+          class="w-full"
+          size="small"
+          inputStyleClass="w-full"
+        />
+      </div>
+
+      <div class="flex items-center justify-between sm:justify-around pt-2 sm:pt-0">
+        <div class="flex items-center gap-2">
+          <p-toggleswitch formControlName="coversShipping" />
+          <span class="text-xs font-medium text-secondary">Cubre Envío</span>
+        </div>
+
+        <button
+          type="button"
+          (click)="removeTier(i)"
+          class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+          title="Eliminar escala"
+        >
+          <i class="pi pi-trash text-sm"></i>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>
