@@ -1,24 +1,48 @@
-import { Component } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 @Component({
   selector: 'app-logo-primary',
-  imports: [],
+  standalone: true,
   template: `
-    <!-- Logo -->
-    <a href="#" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+    <div class="flex items-center gap-2 hover:opacity-80 transition-opacity">
       <div
-        class="w-10 h-10 bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold text-2xl"
+        class="bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold"
+        [class]="logoClasses()"
       >
         C
       </div>
-      <span class="text-2xl font-bold tracking-tight text-white">
+
+      <span
+        class="font-bold tracking-tight text-white"
+        [class]="textClasses()"
+      >
         Chiconcuac<span class="text-sky-400">Market</span>
-        <span
-          class="ml-2 text-xs font-medium bg-white/20 text-white px-2 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm"
-          >Partners</span
-        >
       </span>
-    </a>
+    </div>
   `,
 })
-export class LogoPrimary {}
+export class LogoPrimary {
+  readonly size = input<'small' | 'medium' | 'large'>('medium');
+
+  readonly logoClasses = computed(() => {
+    switch (this.size()) {
+      case 'small':
+        return 'w-6 h-6 text-sm';
+      case 'large':
+        return 'w-10 h-10 text-lg';
+      default:
+        return 'w-8 h-8 text-base';
+    }
+  });
+
+  readonly textClasses = computed(() => {
+    switch (this.size()) {
+      case 'small':
+        return 'text-sm';
+      case 'large':
+        return 'text-lg';
+      default:
+        return 'text-base';
+    }
+  });
+}

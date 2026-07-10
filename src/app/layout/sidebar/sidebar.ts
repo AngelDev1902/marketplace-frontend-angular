@@ -64,7 +64,7 @@ export class SidebarComponent {
   // ─── Clases Computadas con Signals ───────────────────────────────────────────
   sidebarClass(): string {
     const base =
-      'fixed top-14 bottom-0 left-0 z-50 bg-slate-900 text-slate-300 transition-all duration-300 ease-in-out flex flex-col border-r border-slate-800 lg:static lg:translate-x-0 lg:h-full';
+      'fixed top-14 bottom-0 left-0 z-50 bg-card text-secondary transition-all duration-300 ease-in-out flex flex-col border-r border-default lg:static lg:translate-x-0 lg:h-full';
     return this.isCollapsed()
       ? `${base} w-14 -translate-x-full lg:translate-x-0`
       : `${base} w-52 translate-x-0`;
@@ -72,19 +72,19 @@ export class SidebarComponent {
 
   linkClass(): string {
     const base =
-      'flex rounded-md items-center font-medium transition-all duration-150 py-2 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200';
+      'flex rounded-md items-center font-medium transition-all duration-150 py-2 text-muted hover:bg-border-soft hover:text-primary';
     return this.isCollapsed() ? `${base} justify-center px-0` : `${base} gap-2.5 px-3.5`;
   }
 
   themeToggleClass(): string {
     const base =
-      'flex items-center w-full py-2 rounded-lg font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all duration-150 cursor-pointer';
+      'flex items-center w-full py-2 rounded-lg font-medium text-muted hover:bg-border-soft hover:text-primary transition-all duration-150 cursor-pointer';
     return this.isCollapsed() ? `${base} justify-center px-0` : `${base} gap-2.5 px-3.5`;
   }
 
   logoutClass(): string {
     const base =
-      'flex items-center w-full py-2 rounded-lg font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-150 cursor-pointer';
+      'flex items-center w-full py-2 rounded-lg font-medium text-muted hover:bg-red-500/10 hover:text-red-500 transition-all duration-150 cursor-pointer';
     return this.isCollapsed() ? `${base} justify-center px-0` : `${base} gap-2.5 px-3.5`;
   }
 

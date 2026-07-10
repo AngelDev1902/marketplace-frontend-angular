@@ -1,7 +1,7 @@
 <!-- Mobile Overlay -->
 @if (!isCollapsed()) {
 <div
-  class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+  class="fixed inset-0 bg-sidebar/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
   (click)="closeCallback()()"
 ></div>
 }
@@ -28,7 +28,7 @@
   </nav>
 
   <!-- Theme Toggle -->
-  <div class="p-2 border-t border-slate-800">
+  <div class="p-2 border-t border-default">
     <button
       (click)="themeService.toggle()"
       [class]="themeToggleClass()"
@@ -39,7 +39,7 @@
         [class]="
           themeService.isDark()
             ? 'pi pi-sun text-amber-500 text-sm shrink-0'
-            : 'pi pi-moon text-slate-400 text-sm shrink-0'
+            : 'pi pi-moon text-muted text-sm shrink-0'
         "
       ></i>
       @if (!isCollapsed()) {
@@ -49,7 +49,7 @@
   </div>
 
   <!-- Logout -->
-  <div class="p-2 border-t border-slate-800">
+  <div class="p-2 border-t border-default">
     <button
       (click)="logout()"
       [class]="logoutClass()"
