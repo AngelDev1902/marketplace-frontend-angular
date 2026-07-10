@@ -5,10 +5,12 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MenuModule } from 'primeng/menu';
 import { ConfirmationService } from 'primeng/api';
 import { ProductResponse } from '../../../../shared/models/responses/product.response.model';
 import { ProductService } from '../../../../core/services/product.service';
 import { ProductImageModalComponent } from '../../product-image-modal/product-image-modal';
+import { ProductEditInfoModalComponent } from '../../components/product-edit-info/product-edit-info';
 
 @Component({
   selector: 'app-product-list',
@@ -19,7 +21,9 @@ import { ProductImageModalComponent } from '../../product-image-modal/product-im
     ConfirmDialogModule,
     DialogModule,
     ProgressSpinnerModule,
+    MenuModule,
     ProductImageModalComponent,
+    ProductEditInfoModalComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './product-list.html',
@@ -28,6 +32,30 @@ export class ProductListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly productService = inject(ProductService);
+
+  readonly editItems = [
+    {
+      label: 'Información General',
+      icon: 'pi pi-info-circle',
+      command: () => {
+        this.isEditModalOpen.set(true);
+      },
+    },
+    {
+      label: 'Editar escalas de mayoreo',
+      icon: 'pi pi-percentage',
+      command: () => {
+        // Fases futuras
+      },
+    },
+    {
+      label: 'Editar variantes',
+      icon: 'pi pi-clone',
+      command: () => {
+        // Fases futuras
+      },
+    },
+  ];
 
   readonly Number = Number;
 

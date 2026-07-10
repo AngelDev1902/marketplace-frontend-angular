@@ -23,4 +23,8 @@ export class CatalogService {
   getColors(): Observable<ColorOptionDto[]> {
     return this.http.get<ColorOptionDto[]>(`${this.BASE}/colors`);
   }
+
+  getGenders(): Observable<CatalogOptionDto[]> {
+    return this.http.get<CatalogOptionDto[]>(`${this.BASE}/genders`);
+  }
 }

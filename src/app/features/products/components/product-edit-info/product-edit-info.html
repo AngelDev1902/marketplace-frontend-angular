@@ -1,0 +1,145 @@
+<p-dialog
+  [visible]="isOpen()"
+  (visibleChange)="handleClose()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [styleClass]="'w-full sm:w-[600px] max-w-[95vw]'"
+  header="Editar Información General"
+>
+  <div class="p-6 overflow-y-auto max-h-[80vh] space-y-4 text-primary">
+    @if (error()) {
+    <div
+      class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-600 text-xs flex items-center gap-2"
+    >
+      <i class="pi pi-exclamation-circle text-xs shrink-0"></i>
+      <span>{{ error() }}</span>
+    </div>
+    } @if (loadingCategories()) {
+    <div
+      class="flex flex-col items-center justify-center py-10 bg-app border border-default rounded-xl"
+    >
+      <p-progressspinner class="w-8 h-8" strokeWidth="4"></p-progressspinner>
+      <p class="text-secondary text-xs mt-2">Cargando datos...</p>
+    </div>
+    } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Nombre del Producto -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-secondary uppercase tracking-wider"
+          >Nombre del Producto *</label
+        >
+        <input
+          pInputText
+          formControlName="name"
+          placeholder="Ej. Playera Deportiva Premium"
+          class="w-full"
+        />
+        @if (form.get('name')?.touched && form.get('name')?.invalid) {
+        <p class="text-[10px] text-red-500">El nombre es obligatorio.</p>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-secondary uppercase tracking-wider"
+          >Descripción</label
+        >
+        <textarea
+          pTextarea
+          formControlName="description"
+          rows="3"
+          placeholder="Describe los detalles de tu producto..."
+          class="w-full"
+        ></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Categoría -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-secondary uppercase tracking-wider"
+            >Categoría *</label
+          >
+          <p-select
+            formControlName="categoryKey"
+            [options]="categories()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecciona Categoría"
+            class="w-full"
+            appendTo="body"
+          />
+          @if (form.get('categoryKey')?.touched && form.get('categoryKey')?.invalid) {
+          <p class="text-[10px] text-red-500">La categoría es obligatoria.</p>
+          }
+        </div>
+
+        <!-- Categoría -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-secondary uppercase tracking-wider"
+            >Género *</label
+          >
+          <p-select
+            formControlName="gender"
+            [options]="genders()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecciona Categoría"
+            class="w-full"
+            appendTo="body"
+          />
+          @if (form.get('categoryKey')?.touched && form.get('categoryKey')?.invalid) {
+          <p class="text-[10px] text-red-500">La categoría es obligatoria.</p>
+          }
+        </div>
+
+        <!-- Precio Base -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-secondary uppercase tracking-wider"
+            >Precio Base (MXN) *</label
+          >
+          <p-inputnumber
+            formControlName="basePrice"
+            mode="currency"
+            currency="MXN"
+            locale="es-MX"
+            [min]="0"
+            styleClass="w-full"
+            class="w-full"
+          />
+          @if (form.get('basePrice')?.touched && form.get('basePrice')?.invalid) {
+          <p class="text-[10px] text-red-500">
+            El precio base es obligatorio y no puede ser negativo.
+          </p>
+          }
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-soft">
+        <p-button
+          type="button"
+          label="Cancelar"
+          (onClick)="handleClose()"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+        />
+        <p-button
+          type="submit"
+          label="Guardar Cambios"
+          icon="pi pi-check"
+          [disabled]="form.invalid || saving()"
+          size="small"
+        >
+          @if (saving()) {
+          <i class="pi pi-spin pi-spinner text-xs mr-2"></i>
+          }
+        </p-button>
+      </div>
+    </form>
+    }
+  </div>
+</p-dialog>

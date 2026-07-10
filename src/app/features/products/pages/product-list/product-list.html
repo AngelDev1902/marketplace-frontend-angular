@@ -76,8 +76,8 @@
       {{ deleting() ? 'Eliminando producto...' : 'Cargando catálogo...' }}
     </p>
   </div>
-  } 
-  
+  }
+
   <!-- Si ocurre un error al cargar el catálogo, mostrar mensaje de error y botón para reintentar -->
   @else if (error()) {
   <div
@@ -96,8 +96,8 @@
       styleClass="mt-4"
     ></p-button>
   </div>
-  } 
-  
+  }
+
   <!-- Si no hay productos registrados, mostrar mensaje de que no hay productos y botón para crear el primero -->
   @else if (products().length === 0) {
   <div
@@ -119,8 +119,8 @@
       styleClass="mt-6"
     ></p-button>
   </div>
-  } 
-  
+  }
+
   <!-- Si hay productos registrados, mostrar tabla con los productos y sus detalles -->
   @else {
   <div class="bg-card rounded-xl overflow-hidden shadow-xs transition-colors duration-300">
@@ -132,6 +132,7 @@
           >
             <th class="p-3">Producto</th>
             <th class="p-3">Categoría</th>
+            <th class="p-3">Género</th>
             <th class="p-3">Precio Base</th>
             <th class="p-3">Variantes</th>
             <th class="p-3">Stock Físico</th>
@@ -171,7 +172,13 @@
 
             <td class="p-3 text-primary font-medium">
               <span class="tag-glass-indigo text-[10px] px-2 py-0.5 rounded-full">
-                {{ product.categoryKey }}
+                {{ product.category.label }}
+              </span>
+            </td>
+
+            <td class="p-3 text-primary font-medium">
+              <span class="tag-glass-blue text-[10px] px-2 py-0.5 rounded-full">
+                {{ product.gender.label }}
               </span>
             </td>
 
@@ -187,15 +194,11 @@
 
             <td class="p-3">
               @if (isProductActive) {
-              <span
-                class="tag-glass-emerald px-2 py-0.5 rounded-full font-bold"
-              >
+              <span class="tag-glass-emerald px-2 py-0.5 rounded-full font-bold">
                 {{ product.status.label }}
               </span>
               } @else {
-              <span
-                class="tag-glass-red px-2 py-0.5 rounded-full font-bold"
-              >
+              <span class="tag-glass-red px-2 py-0.5 rounded-full font-bold">
                 {{ product.status.label || 'Inactivo' }}
               </span>
               }
@@ -230,7 +233,7 @@
                   size="small"
                   styleClass="h-7 w-7"
                   [text]="true"
-                  (onClick)="handleOpenEditModal(product)"
+                  (onClick)="selectedProductForEdit.set(product); menu.toggle($event)"
                   title="Editar producto"
                 ></p-button>
 
@@ -261,6 +264,17 @@
     (onClose)="handleCloseModal()"
     (onSaveSuccess)="fetchProducts()"
   ></app-product-image-modal>
+
+  <!-- Menú emergente de edición -->
+  <p-menu #menu [model]="editItems" [popup]="true" appendTo="body"></p-menu>
+
+  <!-- Modal de edición de información general -->
+  <app-product-edit-info-modal
+    [isOpen]="isEditModalOpen()"
+    [product]="selectedProductForEdit()"
+    (onClose)="handleCloseEditModal()"
+    (onSaveSuccess)="fetchProducts()"
+  ></app-product-edit-info-modal>
 
   <p-confirmdialog></p-confirmdialog>
 </div>

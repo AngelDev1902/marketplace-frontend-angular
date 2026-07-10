@@ -5,6 +5,7 @@ export interface ProductRequest {
   name: string;
   description: string;
   categoryKey: string;
+  gender: string;
   basePrice: number;
   tiers: ProductsWholesaleTier[];
   images?: ImagesProductRequest[];

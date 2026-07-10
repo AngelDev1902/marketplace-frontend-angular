@@ -63,12 +63,14 @@ export class ProductCreateComponent implements OnInit {
     name: ['', Validators.required],
     description: [''],
     categoryKey: ['', Validators.required],
+    gender: ['', Validators.required],
     basePrice: [0, [Validators.required, Validators.min(0)]],
     tiers: this.fb.array([]),
     variants: this.fb.array([]),
   });
   // Catálogos cargados del backend
   readonly categories = signal<CatalogOptionDto[]>([]);
+  readonly genders = signal<CatalogOptionDto[]>([]);
   readonly sizes = signal<CatalogOptionDto[]>([]);
   readonly colors = signal<ColorOptionDto[]>([]);
 
@@ -96,11 +98,13 @@ export class ProductCreateComponent implements OnInit {
       categories: this.catalogService.getCategories(),
       sizes: this.catalogService.getSizes(),
       colors: this.catalogService.getColors(),
+      genders: this.catalogService.getGenders(),
     }).subscribe({
       next: (res) => {
         this.categories.set(res.categories);
         this.sizes.set(res.sizes);
         this.colors.set(res.colors);
+        this.genders.set(res.genders);
       },
       error: (err) => {
         console.error('Error cargando catálogos:', err);
@@ -142,6 +146,7 @@ export class ProductCreateComponent implements OnInit {
       name: fValue.name!,
       description: fValue.description || '',
       categoryKey: fValue.categoryKey!,
+      gender: fValue.gender!,
       basePrice: fValue.basePrice!,
       tiers: (fValue.tiers as any[]) || [],
       variants: this.hasVariants() ? (fValue.variants as any[]) : undefined,

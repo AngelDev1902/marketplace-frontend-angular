@@ -9,7 +9,8 @@ export interface ProductImageResponse {
 
 export interface ProductResponse {
   uuid: string;
-  categoryKey: string;
+  category: CatalogOptionDto;
+  gender: CatalogOptionDto;
   name: string;
   description: string;
   basePrice: number;
