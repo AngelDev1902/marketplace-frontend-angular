@@ -276,5 +276,21 @@
     (onSaveSuccess)="fetchProducts()"
   ></app-product-edit-info-modal>
 
+  <!-- Modal de escala de precios de mayoreo -->
+  <app-product-tiers-modal
+    [isOpen]="isTiersModalOpen()"
+    [product]="selectedProductForEdit()"
+    (onClose)="handleCloseTiersModal()"
+    (onSaveSuccess)="fetchProducts()"
+  ></app-product-tiers-modal>
+
+  <!-- Modal de variantes del producto -->
+  <app-product-variants-modal
+    [isOpen]="isVariantModalOpen()"
+    [product]="selectedProductForVariants()"
+    (onClose)="handleCloseVariantModal()"
+    (onSaveSuccess)="fetchProducts()"
+  ></app-product-variants-modal>
+
   <p-confirmdialog></p-confirmdialog>
 </div>

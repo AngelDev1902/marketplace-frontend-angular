@@ -9,8 +9,10 @@ import { MenuModule } from 'primeng/menu';
 import { ConfirmationService } from 'primeng/api';
 import { ProductResponse } from '../../../../shared/models/responses/product.response.model';
 import { ProductService } from '../../../../core/services/product.service';
-import { ProductImageModalComponent } from '../../product-image-modal/product-image-modal';
+import { ProductImageModalComponent } from '../../components/product-image-modal/product-image-modal';
 import { ProductEditInfoModalComponent } from '../../components/product-edit-info/product-edit-info';
+import { ProductTiersModalComponent } from '../../components/product-tiers-modal/product-tiers-modal';
+import { ProductVariantsModalComponent } from '../../components/product-variants-modal/product-variants-modal';
 
 @Component({
   selector: 'app-product-list',
@@ -24,6 +26,8 @@ import { ProductEditInfoModalComponent } from '../../components/product-edit-inf
     MenuModule,
     ProductImageModalComponent,
     ProductEditInfoModalComponent,
+    ProductTiersModalComponent,
+    ProductVariantsModalComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './product-list.html',
@@ -45,14 +49,15 @@ export class ProductListComponent implements OnInit {
       label: 'Editar escalas de mayoreo',
       icon: 'pi pi-percentage',
       command: () => {
-        // Fases futuras
+        this.isTiersModalOpen.set(true);
       },
     },
     {
       label: 'Editar variantes',
       icon: 'pi pi-clone',
       command: () => {
-        // Fases futuras
+        this.selectedProductForVariants.set(this.selectedProductForEdit());
+        this.isVariantModalOpen.set(true);
       },
     },
   ];
@@ -74,6 +79,7 @@ export class ProductListComponent implements OnInit {
 
   readonly selectedProductForEdit = signal<ProductResponse | null>(null);
   readonly isEditModalOpen = signal<boolean>(false);
+  readonly isTiersModalOpen = signal<boolean>(false);
 
   // --- Cálculos de estadísticas optimizados mediante Computed Signals ---
   readonly registeredCount = computed(() => this.products().length);
@@ -142,6 +148,10 @@ export class ProductListComponent implements OnInit {
   handleCloseEditModal(): void {
     this.isEditModalOpen.set(false);
     this.selectedProductForEdit.set(null);
+  }
+
+  handleCloseTiersModal(): void {
+    this.isTiersModalOpen.set(false);
   }
 
   // Confirmación nativa de Eliminación Lógica mediante PrimeNG ConfirmDialog
