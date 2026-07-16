@@ -13,6 +13,7 @@ import { ProductImageModalComponent } from '../../components/product-image-modal
 import { ProductEditInfoModalComponent } from '../../components/product-edit-info/product-edit-info';
 import { ProductTiersModalComponent } from '../../components/product-tiers-modal/product-tiers-modal';
 import { ProductVariantsModalComponent } from '../../components/product-variants-modal/product-variants-modal';
+import { ProductSizeGuideModalComponent } from '../../components/product-size-guide-modal/product-size-guide-modal';
 
 @Component({
   selector: 'app-product-list',
@@ -28,6 +29,7 @@ import { ProductVariantsModalComponent } from '../../components/product-variants
     ProductEditInfoModalComponent,
     ProductTiersModalComponent,
     ProductVariantsModalComponent,
+    ProductSizeGuideModalComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './product-list.html',
@@ -60,6 +62,13 @@ export class ProductListComponent implements OnInit {
         this.isVariantModalOpen.set(true);
       },
     },
+    {
+      label: 'Guía de tallas',
+      icon: 'pi pi-table',
+      command: () => {
+        this.isSizeGuideModalOpen.set(true);
+      },
+    },
   ];
 
   readonly Number = Number;
@@ -80,6 +89,7 @@ export class ProductListComponent implements OnInit {
   readonly selectedProductForEdit = signal<ProductResponse | null>(null);
   readonly isEditModalOpen = signal<boolean>(false);
   readonly isTiersModalOpen = signal<boolean>(false);
+  readonly isSizeGuideModalOpen = signal<boolean>(false);
 
   // --- Cálculos de estadísticas optimizados mediante Computed Signals ---
   readonly registeredCount = computed(() => this.products().length);
@@ -152,6 +162,10 @@ export class ProductListComponent implements OnInit {
 
   handleCloseTiersModal(): void {
     this.isTiersModalOpen.set(false);
+  }
+
+  handleCloseSizeGuideModal(): void {
+    this.isSizeGuideModalOpen.set(false);
   }
 
   // Confirmación nativa de Eliminación Lógica mediante PrimeNG ConfirmDialog

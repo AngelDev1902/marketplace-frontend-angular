@@ -292,5 +292,13 @@
     (onSaveSuccess)="fetchProducts()"
   ></app-product-variants-modal>
 
+  <!-- Modal de guía de tallas del producto -->
+  <app-product-size-guide-modal
+    [isOpen]="isSizeGuideModalOpen()"
+    [product]="selectedProductForEdit()"
+    (onClose)="handleCloseSizeGuideModal()"
+    (onSaveSuccess)="fetchProducts()"
+  ></app-product-size-guide-modal>
+
   <p-confirmdialog></p-confirmdialog>
 </div>

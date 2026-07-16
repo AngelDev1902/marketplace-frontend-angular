@@ -1,0 +1,251 @@
+<p-dialog
+  [visible]="isOpen()"
+  (visibleChange)="handleClose()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [styleClass]="'w-full sm:w-[750px] max-w-[95vw]'"
+  [header]="'Guía de Tallas - ' + (product()?.name || '')"
+>
+  <div class="p-6 overflow-y-auto max-h-[85vh] space-y-5 text-primary">
+    <!-- Error Alert -->
+    @if (error()) {
+    <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-600 text-xs flex items-center gap-2">
+      <i class="pi pi-exclamation-circle text-xs shrink-0"></i>
+      <span>{{ error() }}</span>
+    </div>
+    }
+
+    <!-- Loading State -->
+    @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-10 bg-app border border-default rounded-xl">
+      <p-progressspinner class="w-8 h-8" strokeWidth="4"></p-progressspinner>
+      <p class="text-secondary text-xs mt-2">Cargando guía de tallas...</p>
+    </div>
+    } @else {
+
+      <!-- Guide Type Switch -->
+      <div class="flex items-center justify-between p-4 bg-app border border-default rounded-xl">
+        <div class="space-y-0.5">
+          <span class="text-xs font-bold text-primary block">¿Usar guía personalizada?</span>
+          <span class="text-[10px] text-secondary">
+            Actívalo para ingresar tus propias medidas en vez de usar una plantilla.
+          </span>
+        </div>
+        <p-toggleswitch
+          [ngModel]="isCustom()"
+          (ngModelChange)="toggleCustom($event)"
+        />
+      </div>
+
+      <!-- Option A: Standard / Templates -->
+      @if (!isCustom()) {
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Plantillas por Defecto -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-secondary uppercase tracking-wider">Plantillas por Defecto</label>
+              <p-select
+                [ngModel]="selectedTemplateId()"
+                (ngModelChange)="onTemplateChange('default', $event)"
+                [options]="defaultTemplates()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona Plantilla por Defecto"
+                class="w-full"
+                appendTo="body"
+              />
+            </div>
+
+            <!-- Plantillas del Usuario -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-secondary uppercase tracking-wider">Mis Plantillas (Vendedor)</label>
+              <p-select
+                [ngModel]="selectedTemplateId()"
+                (ngModelChange)="onTemplateChange('user', $event)"
+                [options]="userTemplates()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona Tu Plantilla"
+                class="w-full"
+                appendTo="body"
+                [disabled]="userTemplates().length === 0"
+              />
+              @if (userTemplates().length === 0) {
+              <p class="text-[10px] text-muted">No tienes plantillas creadas.</p>
+              }
+            </div>
+          </div>
+
+          <!-- Template Configuration Preview -->
+          @if (templatePreview(); as preview) {
+            <div class="bg-app border border-default rounded-xl p-4 space-y-3">
+              <div class="flex items-center justify-between border-b border-soft pb-2">
+                <h4 class="text-xs font-bold text-primary uppercase tracking-wider">Vista Previa de la Plantilla</h4>
+                <span class="text-[10px] font-semibold text-secondary uppercase bg-default px-2 py-0.5 rounded-full border border-default">
+                  Pre-configurada
+                </span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="bg-default/40 border-b border-default text-secondary font-bold uppercase tracking-wider">
+                      <th class="p-2">Talla</th>
+                      @for (col of preview.columns; track col) {
+                        <th class="p-2 text-center">{{ col }}</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-border-soft">
+                    @for (row of preview.rows; track row.sizeKey) {
+                      <tr class="hover:bg-default/10">
+                        <td class="p-2 font-bold text-primary">{{ row.sizeKey }}</td>
+                        @for (col of preview.columns; track col) {
+                          <td class="p-2 text-center text-secondary font-medium">
+                            @let min = row.values[col]?.min;
+                            @let max = row.values[col]?.max;
+                            @if (min !== undefined || max !== undefined) {
+                              {{ min || 0 }}{{ max ? ' - ' + max : 'cm+' }}
+                            } @else {
+                              -
+                            }
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Option B: Custom Size Guide -->
+      @else {
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Unidad de Medida -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-secondary uppercase tracking-wider">Unidad de Medida *</label>
+              <p-select
+                [ngModel]="selectedUnitKey()"
+                (ngModelChange)="selectedUnitKey.set($event)"
+                [options]="units()"
+                optionLabel="name"
+                optionValue="key"
+                placeholder="Selecciona Unidad"
+                class="w-full"
+                appendTo="body"
+              />
+            </div>
+
+            <!-- Tipos de Medida (Columnas) -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-secondary uppercase tracking-wider">Tipo de Medida a Llenar (Columnas)</label>
+              <p-multiselect
+                [ngModel]="selectedColumns()"
+                (ngModelChange)="selectedColumns.set($event)"
+                [options]="measurementTypes()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona Columnas"
+                class="w-full"
+                appendTo="body"
+                [maxSelectedLabels]="3"
+              />
+            </div>
+          </div>
+
+          <!-- Custom Grid Table -->
+          @if (selectedColumns().length === 0) {
+            <div class="text-center py-8 border border-dashed border-default rounded-xl bg-app text-muted text-xs">
+              Selecciona al menos un Tipo de Medida arriba para comenzar a rellenar la tabla.
+            </div>
+          } @else {
+            <div class="bg-app border border-default rounded-xl overflow-hidden">
+              <div class="overflow-x-auto max-w-full">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="bg-default/40 border-b border-default text-secondary font-bold uppercase tracking-wider">
+                      <th class="p-3 w-20 shrink-0">Talla</th>
+                      @for (col of selectedColumns(); track col) {
+                        <th class="p-3 text-center min-w-[180px]">{{ col }} (Min / Max)</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-border-soft">
+                    @for (row of customRows(); track row.sizeKey) {
+                      <tr class="hover:bg-default/10">
+                        <td class="p-3 font-bold text-primary">{{ row.sizeName }}</td>
+                        @for (col of selectedColumns(); track col) {
+                          <td class="p-3">
+                            <div class="flex items-center justify-center gap-1">
+                              <!-- Min Input -->
+                              <p-inputnumber
+                                [ngModel]="getCellValue(row, col, 'min')"
+                                (ngModelChange)="setCellValue(row, col, 'min', $event)"
+                                [min]="0"
+                                [maxFractionDigits]="2"
+                                placeholder="Min"
+                                styleClass="w-20"
+                                class="w-20"
+                                size="small"
+                                inputStyleClass="w-full text-center text-xs p-1"
+                              />
+                              <span class="text-muted text-[10px] font-bold">-</span>
+                              <!-- Max Input -->
+                              <p-inputnumber
+                                [ngModel]="getCellValue(row, col, 'max')"
+                                (ngModelChange)="setCellValue(row, col, 'max', $event)"
+                                [min]="0"
+                                [maxFractionDigits]="2"
+                                placeholder="Max"
+                                styleClass="w-20"
+                                class="w-20"
+                                size="small"
+                                inputStyleClass="w-full text-center text-xs p-1"
+                              />
+                            </div>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Footer Buttons -->
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-soft">
+        <p-button
+          type="button"
+          label="Cancelar"
+          (onClick)="handleClose()"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+        />
+        <p-button
+          type="button"
+          label="Guardar Cambios"
+          icon="pi pi-check"
+          [disabled]="(!isCustom() && !selectedTemplateId()) || (isCustom() && (!selectedUnitKey() || selectedColumns().length === 0)) || saving()"
+          size="small"
+          (onClick)="onSubmit()"
+        >
+          @if (saving()) {
+          <i class="pi pi-spin pi-spinner text-xs mr-2"></i>
+          }
+        </p-button>
+      </div>
+
+    }
+  </div>
+</p-dialog>
