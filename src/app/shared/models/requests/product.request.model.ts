@@ -1,13 +1,13 @@
 import { ProductVariantRequest } from './variant.request.model';
-import { ProductsWholesaleTier } from './wholesale.model';
+import { ProductWholesaleTierRequest } from './wholesale.model';
 
 export interface ProductRequest {
   name: string;
   description: string;
   categoryKey: string;
-  gender: string;
+  genderKey: string;
   basePrice: number;
-  tiers: ProductsWholesaleTier[];
+  tiers: ProductWholesaleTierRequest[];
   images?: ImagesProductRequest[];
   variants?: ProductVariantRequest[];
 }

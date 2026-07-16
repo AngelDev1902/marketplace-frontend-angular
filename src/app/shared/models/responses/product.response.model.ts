@@ -19,3 +19,12 @@ export interface ProductResponse {
   status: CatalogOptionDto;
   quantityVariants: number;
 }
+
+export interface ProductWholesaleTierResponse {
+  id: string;
+  minQuantity: number;
+  maxQuantity: number | null;
+  unitPrice: number;
+  coversShipping: boolean;
+}
+

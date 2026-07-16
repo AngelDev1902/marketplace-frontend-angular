@@ -10,9 +10,11 @@ import {
 import {
   ProductResponse,
   ProductImageResponse,
+  ProductWholesaleTierResponse,
 } from '../../shared/models/responses/product.response.model';
 import { ProductVariantRequest } from '../../shared/models/requests/variant.request.model';
 import { ProductVariantResponse } from '../../shared/models/responses/variant.response.model';
+import { ProductWholesaleTierRequest } from '../../shared/models/requests/wholesale.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -21,6 +23,10 @@ export class ProductService {
 
   getMyProducts(): Observable<ProductResponse[]> {
     return this.http.get<ProductResponse[]>(this.BASE);
+  }
+
+  getProductById(productId: string): Observable<ProductResponse> {
+    return this.http.get<ProductResponse>(`${this.BASE}/${productId}`);
   }
 
   createProduct(dto: ProductRequest): Observable<ProductResponse> {
@@ -77,5 +83,28 @@ export class ProductService {
 
   deleteProductVariant(productId: string, variantId: string): Observable<void> {
     return this.http.delete<void>(`${this.BASE}/${productId}/variants/${variantId}`);
+  }
+
+  // ─── Wholesale Tiers ──────────────────────────────────────────────────────
+  getProductWholesaleTiers(productId: string): Observable<ProductWholesaleTierResponse[]> {
+    return this.http.get<ProductWholesaleTierResponse[]>(`${this.BASE}/${productId}/tiers`);
+  }
+
+  addWholesaleTier(
+    productId: string,
+    dto: ProductWholesaleTierRequest
+  ): Observable<ProductWholesaleTierResponse> {
+    return this.http.post<ProductWholesaleTierResponse>(`${this.BASE}/${productId}/tiers`, dto);
+  }
+
+  updateWholesaleTier(
+    tierId: string,
+    dto: ProductWholesaleTierRequest
+  ): Observable<ProductWholesaleTierResponse> {
+    return this.http.put<ProductWholesaleTierResponse>(`${this.BASE}/tiers/${tierId}`, dto);
+  }
+
+  deleteWholesaleTier(tierId: string): Observable<void> {
+    return this.http.delete<void>(`${this.BASE}/tiers/${tierId}`);
   }
 }

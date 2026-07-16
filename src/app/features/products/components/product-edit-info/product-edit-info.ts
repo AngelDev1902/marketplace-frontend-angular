@@ -112,6 +112,7 @@ export class ProductEditInfoModalComponent implements OnInit {
       name: fValue.name!,
       description: fValue.description || '',
       categoryKey: fValue.categoryKey!,
+      genderKey: fValue.gender!,
       basePrice: fValue.basePrice!,
     };
 

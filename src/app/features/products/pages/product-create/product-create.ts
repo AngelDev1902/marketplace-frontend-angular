@@ -146,9 +146,14 @@ export class ProductCreateComponent implements OnInit {
       name: fValue.name!,
       description: fValue.description || '',
       categoryKey: fValue.categoryKey!,
-      gender: fValue.gender!,
+      genderKey: fValue.gender!,
       basePrice: fValue.basePrice!,
-      tiers: (fValue.tiers as any[]) || [],
+      tiers: ((fValue.tiers as any[]) || []).map((t) => ({
+        minQuantity: t.minQuantity,
+        maxQuantity: t.maxQuantity,
+        unitPrice: t.price,
+        coversShipping: t.coversShipping,
+      })),
       variants: this.hasVariants() ? (fValue.variants as any[]) : undefined,
       images: mappedImages.length > 0 ? mappedImages : undefined,
     };
