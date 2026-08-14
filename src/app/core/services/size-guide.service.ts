@@ -37,11 +37,15 @@ export class SizeGuideService {
   }
 
   getGlobalTemplates(): Observable<SizeGuideTemplateOptionResponse[]> {
-    return this.http.get<SizeGuideTemplateOptionResponse[]>(`${this.VENDOR_BASE}/size-guides/global-templates`);
+    return this.http.get<SizeGuideTemplateOptionResponse[]>(
+      `${this.VENDOR_BASE}/size-guides/global-templates`
+    );
   }
 
   getTemplateDetails(templateId: string): Observable<SizeGuideTemplateResponse> {
-    return this.http.get<SizeGuideTemplateResponse>(`${this.VENDOR_BASE}/size-guides/templates/${templateId}`);
+    return this.http.get<SizeGuideTemplateResponse>(
+      `${this.VENDOR_BASE}/size-guides/templates/${templateId}`
+    );
   }
 
   saveProductSizeGuide(
